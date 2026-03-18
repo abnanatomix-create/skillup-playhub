@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +15,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import LessonForm from "@/components/LessonForm";
+import AdminLogin from "@/components/AdminLogin";
 import Navbar from "@/components/Navbar";
 import { getLessons, createLesson, updateLesson, deleteLesson, togglePublish, type Lesson } from "@/lib/lessons";
+import { isAdminLoggedIn, logoutAdmin } from "@/lib/admin-auth";
 import { toast } from "@/hooks/use-toast";
 
 const Admin = () => {
+  const [authenticated, setAuthenticated] = useState(isAdminLoggedIn);
   const [lessons, setLessons] = useState<Lesson[]>(getLessons);
   const [showForm, setShowForm] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
