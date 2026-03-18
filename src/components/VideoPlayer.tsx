@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Loader2, AlertCircle } from "lucide-react";
+import { extractVideoSrc } from "@/lib/video-utils";
 
 interface VideoPlayerProps {
   videoLink: string;
@@ -8,8 +8,9 @@ interface VideoPlayerProps {
 
 const VideoPlayer = ({ videoLink }: VideoPlayerProps) => {
   const [loading, setLoading] = useState(true);
+  const src = extractVideoSrc(videoLink);
 
-  if (!videoLink) {
+  if (!src) {
     return (
       <div className="w-full aspect-video rounded-xl bg-card border border-border flex items-center justify-center gap-3">
         <AlertCircle className="text-destructive" size={24} />
@@ -26,7 +27,7 @@ const VideoPlayer = ({ videoLink }: VideoPlayerProps) => {
         </div>
       )}
       <iframe
-        src={videoLink}
+        src={src}
         className="w-full h-full"
         allow="autoplay; encrypted-media"
         allowFullScreen
