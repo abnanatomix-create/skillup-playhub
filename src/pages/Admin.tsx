@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { extractVideoSrc } from "@/lib/video-utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
