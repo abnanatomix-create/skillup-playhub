@@ -136,8 +136,8 @@ const Admin = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                       {/* Thumbnail */}
                       <div className="w-full sm:w-40 aspect-video rounded-lg overflow-hidden bg-secondary flex-shrink-0">
-                        {lesson.videoLink ? (
-                          <iframe src={lesson.videoLink} className="w-full h-full pointer-events-none" title={lesson.title} tabIndex={-1} />
+                        {extractVideoSrc(lesson.videoLink) ? (
+                          <iframe src={extractVideoSrc(lesson.videoLink)} className="w-full h-full pointer-events-none" title={lesson.title} tabIndex={-1} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">No video</div>
                         )}
