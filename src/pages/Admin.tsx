@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +15,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import LessonForm from "@/components/LessonForm";
+import AdminLogin from "@/components/AdminLogin";
 import Navbar from "@/components/Navbar";
 import { getLessons, createLesson, updateLesson, deleteLesson, togglePublish, type Lesson } from "@/lib/lessons";
+import { isAdminLoggedIn, logoutAdmin } from "@/lib/admin-auth";
 import { toast } from "@/hooks/use-toast";
 
 const Admin = () => {
+  const [authenticated, setAuthenticated] = useState(isAdminLoggedIn);
   const [lessons, setLessons] = useState<Lesson[]>(getLessons);
   const [showForm, setShowForm] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
@@ -67,19 +70,32 @@ const Admin = () => {
 
   const isFormOpen = showForm || editingLesson !== null;
 
+  if (!authenticated) {
+    return <AdminLogin onSuccess={() => setAuthenticated(true)} />;
+  }
+
+  const handleLogout = () => {
+    logoutAdmin();
+    setAuthenticated(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="max-w-[900px] mx-auto px-4 py-6 sm:py-10">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          {!isFormOpen && (
-            <Button onClick={() => setShowForm(true)} className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold gap-2">
-              <Plus size={18} /> Add Lesson
+          <div className="flex items-center gap-2">
+            {!isFormOpen && (
+              <Button onClick={() => setShowForm(true)} className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold gap-2">
+                <Plus size={18} /> Add Lesson
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
+              <LogOut size={18} />
             </Button>
-          )}
+          </div>
         </div>
-
         <AnimatePresence mode="wait">
           {isFormOpen && (
             <motion.div
