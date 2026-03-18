@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import type { Easing } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import VideoPlayer from "@/components/VideoPlayer";
 import FullscreenButton from "@/components/FullscreenButton";
