@@ -49,8 +49,8 @@ const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
         <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Course description..." rows={4} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="videoLink">Video Link (Google Drive /preview) *</Label>
-        <Input id="videoLink" value={videoLink} onChange={(e) => setVideoLink(e.target.value)} placeholder="https://drive.google.com/file/d/FILE_ID/preview" required />
+        <Label htmlFor="videoLink">Video Embed Code (Google Drive iframe) *</Label>
+        <Textarea id="videoLink" value={videoLink} onChange={(e) => setVideoLink(e.target.value)} placeholder='<iframe src="https://drive.google.com/file/d/FILE_ID/preview" ...></iframe>' rows={3} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="handoutLink">Handout Link (optional)</Label>
