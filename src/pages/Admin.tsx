@@ -96,12 +96,6 @@ const Admin = () => {
             </Button>
           </div>
         </div>
-            <Button onClick={() => setShowForm(true)} className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold gap-2">
-              <Plus size={18} /> Add Lesson
-            </Button>
-          )}
-        </div>
-
         <AnimatePresence mode="wait">
           {isFormOpen && (
             <motion.div
