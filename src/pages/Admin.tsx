@@ -70,13 +70,32 @@ const Admin = () => {
 
   const isFormOpen = showForm || editingLesson !== null;
 
+  if (!authenticated) {
+    return <AdminLogin onSuccess={() => setAuthenticated(true)} />;
+  }
+
+  const handleLogout = () => {
+    logoutAdmin();
+    setAuthenticated(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="max-w-[900px] mx-auto px-4 py-6 sm:py-10">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          {!isFormOpen && (
+          <div className="flex items-center gap-2">
+            {!isFormOpen && (
+              <Button onClick={() => setShowForm(true)} className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold gap-2">
+                <Plus size={18} /> Add Lesson
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
+              <LogOut size={18} />
+            </Button>
+          </div>
+        </div>
             <Button onClick={() => setShowForm(true)} className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold gap-2">
               <Plus size={18} /> Add Lesson
             </Button>
