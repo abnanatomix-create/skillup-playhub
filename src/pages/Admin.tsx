@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut } 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +22,8 @@ import Navbar from "@/components/Navbar";
 import { getLessons, createLesson, updateLesson, deleteLesson, togglePublish, type Lesson } from "@/lib/lessons";
 import { isAdminLoggedIn, logoutAdmin } from "@/lib/admin-auth";
 import { toast } from "@/hooks/use-toast";
+
+const getPreviewUrl = (id: string) => `${window.location.origin}/preview/${id}`;
 
 const Admin = () => {
   const [authenticated, setAuthenticated] = useState(isAdminLoggedIn);
@@ -62,11 +65,10 @@ const Admin = () => {
   };
 
   const copyLink = (id: string) => {
-    const url = `${window.location.origin}/lesson/${id}`;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(getPreviewUrl(id));
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
-    toast({ title: "Link copied!" });
+    toast({ title: "Preview link copied!" });
   };
 
   const isFormOpen = showForm || editingLesson !== null;
@@ -152,7 +154,28 @@ const Admin = () => {
                           </Badge>
                         </div>
                         {lesson.instructor && <p className="text-sm text-muted-foreground mb-1">Instructor: {lesson.instructor}</p>}
-                        {lesson.description && <p className="text-sm text-muted-foreground line-clamp-2">{lesson.description}</p>}
+                        {lesson.description && <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{lesson.description}</p>}
+
+                        {/* Preview link for published lessons */}
+                        {lesson.published && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <Input
+                              readOnly
+                              value={getPreviewUrl(lesson.id)}
+                              className="text-xs h-8 bg-secondary border-border text-muted-foreground font-mono"
+                              onClick={(e) => (e.target as HTMLInputElement).select()}
+                            />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 px-3 flex-shrink-0 gap-1.5"
+                              onClick={() => copyLink(lesson.id)}
+                            >
+                              {copiedId === lesson.id ? <Check size={14} className="text-accent" /> : <Copy size={14} />}
+                              <span className="text-xs">{copiedId === lesson.id ? "Copied" : "Copy"}</span>
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
                       {/* Actions */}
@@ -163,11 +186,8 @@ const Admin = () => {
                         <Button size="icon" variant="ghost" onClick={() => setEditingLesson(lesson)} title="Edit">
                           <Pencil size={16} />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => copyLink(lesson.id)} title="Copy lesson link">
-                          {copiedId === lesson.id ? <Check size={16} className="text-accent" /> : <Copy size={16} />}
-                        </Button>
                         <Button size="icon" variant="ghost" asChild title="Preview">
-                          <a href={`/lesson/${lesson.id}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={16} /></a>
+                          <a href={`/preview/${lesson.id}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={16} /></a>
                         </Button>
                         <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(lesson.id)} title="Delete">
                           <Trash2 size={16} />
