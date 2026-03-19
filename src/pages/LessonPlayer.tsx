@@ -24,7 +24,7 @@ const LessonPlayer = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const returnUrl = searchParams.get("return");
-  const backLink = returnUrl || "/";
+  const backLink = returnUrl || "https://skill-up-abn.netlify.app/dashboard";
 
   const [lesson, setLesson] = useState<Lesson | undefined | null>(null);
   const [loading, setLoading] = useState(true);
