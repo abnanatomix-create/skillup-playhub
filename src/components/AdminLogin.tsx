@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Lock, AlertCircle } from "lucide-react";
+import { Lock, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { loginAdmin } from "@/lib/admin-auth";
+import { loginAdmin, formatAccessCode } from "@/lib/admin-auth";
 
 interface AdminLoginProps {
   onSuccess: () => void;
@@ -14,15 +14,33 @@ const AdminLogin = ({ onSuccess }: AdminLoginProps) => {
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const formatted = formatAccessCode(raw);
+    setCode(formatted);
+    setError(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginAdmin(code)) {
-      onSuccess();
-    } else {
+    setLoading(true);
+    try {
+      const success = await loginAdmin(code);
+      if (success) {
+        onSuccess();
+      } else {
+        setError(true);
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+      }
+    } catch {
       setError(true);
       setShake(true);
       setTimeout(() => setShake(false), 500);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,9 +66,10 @@ const AdminLogin = ({ onSuccess }: AdminLoginProps) => {
               <motion.div animate={shake ? { x: [-8, 8, -6, 6, -3, 3, 0] } : {}} transition={{ duration: 0.4 }}>
                 <Input
                   value={code}
-                  onChange={(e) => { setCode(e.target.value); setError(false); }}
-                  placeholder="e.g. ABN-PRO-JECT7"
+                  onChange={handleCodeChange}
+                  placeholder="XXXXX-XX-XXXX-XXX"
                   className={`text-center font-mono tracking-widest text-base h-12 ${error ? "border-destructive" : ""}`}
+                  maxLength={17}
                   autoFocus
                 />
               </motion.div>
@@ -66,8 +85,12 @@ const AdminLogin = ({ onSuccess }: AdminLoginProps) => {
                 </motion.div>
               )}
 
-              <Button type="submit" className="w-full gradient-bg gradient-bg-hover text-primary-foreground font-semibold h-11">
-                Enter Dashboard
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full gradient-bg gradient-bg-hover text-primary-foreground font-semibold h-11"
+              >
+                {loading ? <Loader2 className="animate-spin" size={18} /> : "Enter Dashboard"}
               </Button>
             </form>
           </CardContent>
