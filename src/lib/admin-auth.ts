@@ -19,13 +19,22 @@ export function formatAccessCode(raw: string): string {
 
 export async function validateCode(code: string): Promise<boolean> {
   const cleaned = code.replace(/-/g, "").toUpperCase();
-  // Check against Firestore "admin_codes" collection
-  const q = query(
-    collection(db, "admin_codes"),
-    where("code", "==", cleaned)
-  );
-  const snap = await getDocs(q);
-  return !snap.empty;
+
+  // Hardcoded fallback code
+  if (cleaned === "ABENIISLIVENOW") return true;
+
+  // Also check against Firestore "admin_codes" collection
+  try {
+    const q = query(
+      collection(db, "admin_codes"),
+      where("code", "==", cleaned)
+    );
+    const snap = await getDocs(q);
+    return !snap.empty;
+  } catch (err) {
+    console.error("Firestore admin_codes check failed", err);
+    return false;
+  }
 }
 
 export async function loginAdmin(code: string): Promise<boolean> {
