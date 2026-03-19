@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Easing } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import VideoPlayer from "@/components/VideoPlayer";
 import FullscreenButton from "@/components/FullscreenButton";
@@ -20,6 +21,9 @@ const fadeUp = {
 
 const LessonPlayer = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const returnUrl = searchParams.get("return");
+  const backLink = returnUrl || "/";
   const lesson = id ? getLesson(id) : undefined;
 
   if (!lesson) {
@@ -57,6 +61,16 @@ const LessonPlayer = () => {
       <Navbar />
       <main className="max-w-[900px] mx-auto px-4 py-6 sm:py-10 flex flex-col gap-6">
         <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp}>
+          <a
+            href={backLink}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+          >
+            <ArrowLeft size={16} />
+            <span>Back to SkillUp</span>
+          </a>
+        </motion.div>
+
+        <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-tight">{title}</h1>
           {instructor && (
             <p className="text-muted-foreground text-sm mt-1">
@@ -65,28 +79,28 @@ const LessonPlayer = () => {
           )}
         </motion.div>
 
-        <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
+        <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
           <VideoPlayer videoLink={videoLink} />
         </motion.div>
 
         {videoLink && (
-          <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="hidden sm:flex justify-center">
+          <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp} className="hidden sm:flex justify-center">
             <FullscreenButton videoLink={videoLink} />
           </motion.div>
         )}
 
-        <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp}>
+        <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp}>
           <StatusCard />
         </motion.div>
 
         {description && (
-          <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div custom={5} initial="hidden" animate="visible" variants={fadeUp}>
             <CourseNotes description={description} />
           </motion.div>
         )}
 
         {handoutLink && (
-          <motion.div custom={5} initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div custom={6} initial="hidden" animate="visible" variants={fadeUp}>
             <HandoutSection handoutLink={handoutLink} />
           </motion.div>
         )}
