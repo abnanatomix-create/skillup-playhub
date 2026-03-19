@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { extractVideoSrc } from "@/lib/video-utils";
 
 interface HandoutSectionProps {
   handoutLink: string;
@@ -9,6 +10,9 @@ const HandoutSection = ({ handoutLink }: HandoutSectionProps) => {
   const [loading, setLoading] = useState(true);
 
   if (!handoutLink) return null;
+
+  // Support both plain URLs and iframe embed codes
+  const src = extractVideoSrc(handoutLink) || handoutLink;
 
   return (
     <div className="rounded-xl bg-card border border-border p-6">
@@ -20,7 +24,7 @@ const HandoutSection = ({ handoutLink }: HandoutSectionProps) => {
           </div>
         )}
         <iframe
-          src={handoutLink}
+          src={src}
           className="w-full h-full"
           onLoad={() => setLoading(false)}
           title="Handout"

@@ -53,8 +53,8 @@ const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
         <Textarea id="videoLink" value={videoLink} onChange={(e) => setVideoLink(e.target.value)} placeholder='<iframe src="https://drive.google.com/file/d/FILE_ID/preview" ...></iframe>' rows={3} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="handoutLink">Handout Link (optional)</Label>
-        <Input id="handoutLink" value={handoutLink} onChange={(e) => setHandoutLink(e.target.value)} placeholder="PDF or PPT link" />
+        <Label htmlFor="handoutLink">Handout Embed Code or Link (optional)</Label>
+        <Textarea id="handoutLink" value={handoutLink} onChange={(e) => setHandoutLink(e.target.value)} placeholder='<iframe src="https://docs.google.com/presentation/d/FILE_ID/embed" ...></iframe> or direct URL' rows={3} />
       </div>
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold">
