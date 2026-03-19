@@ -54,7 +54,7 @@ const Index = () => {
         </motion.div>
 
         {/* Fullscreen Button */}
-        <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="flex justify-center">
+        <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="hidden sm:flex justify-center">
           <FullscreenButton videoLink={videoLink} />
         </motion.div>
 
