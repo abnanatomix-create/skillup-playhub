@@ -1,3 +1,17 @@
+import { db } from "./firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  where,
+} from "firebase/firestore";
+
 export interface Lesson {
   id: string;
   title: string;
@@ -10,67 +24,62 @@ export interface Lesson {
   updatedAt: string;
 }
 
-const STORAGE_KEY = "skillup_lessons";
+const COLLECTION = "lessons";
 
-function getAll(): Lesson[] {
+export async function getLessons(): Promise<Lesson[]> {
+  const q = query(collection(db, COLLECTION), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Lesson));
+}
+
+export async function getPublishedLessons(): Promise<Lesson[]> {
+  const q = query(
+    collection(db, COLLECTION),
+    where("published", "==", true),
+    orderBy("createdAt", "desc")
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Lesson));
+}
+
+export async function getLesson(id: string): Promise<Lesson | undefined> {
+  const snap = await getDoc(doc(db, COLLECTION, id));
+  if (!snap.exists()) return undefined;
+  return { id: snap.id, ...snap.data() } as Lesson;
+}
+
+export async function createLesson(
+  data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">
+): Promise<Lesson> {
+  const now = new Date().toISOString();
+  const payload = { ...data, published: false, createdAt: now, updatedAt: now };
+  const ref = await addDoc(collection(db, COLLECTION), payload);
+  return { id: ref.id, ...payload };
+}
+
+export async function updateLesson(
+  id: string,
+  data: Partial<Omit<Lesson, "id" | "createdAt">>
+): Promise<Lesson | null> {
+  const ref = doc(db, COLLECTION, id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  const updated = { ...data, updatedAt: new Date().toISOString() };
+  await updateDoc(ref, updated);
+  return { id, ...snap.data(), ...updated } as Lesson;
+}
+
+export async function deleteLesson(id: string): Promise<boolean> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    await deleteDoc(doc(db, COLLECTION, id));
+    return true;
   } catch {
-    return [];
+    return false;
   }
 }
 
-function saveAll(lessons: Lesson[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lessons));
-}
-
-export function getLessons(): Lesson[] {
-  return getAll().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-}
-
-export function getPublishedLessons(): Lesson[] {
-  return getLessons().filter((l) => l.published);
-}
-
-export function getLesson(id: string): Lesson | undefined {
-  return getAll().find((l) => l.id === id);
-}
-
-export function createLesson(data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">): Lesson {
-  const now = new Date().toISOString();
-  const lesson: Lesson = {
-    ...data,
-    id: crypto.randomUUID(),
-    published: false,
-    createdAt: now,
-    updatedAt: now,
-  };
-  const all = getAll();
-  all.push(lesson);
-  saveAll(all);
-  return lesson;
-}
-
-export function updateLesson(id: string, data: Partial<Omit<Lesson, "id" | "createdAt">>): Lesson | null {
-  const all = getAll();
-  const idx = all.findIndex((l) => l.id === id);
-  if (idx === -1) return null;
-  all[idx] = { ...all[idx], ...data, updatedAt: new Date().toISOString() };
-  saveAll(all);
-  return all[idx];
-}
-
-export function deleteLesson(id: string): boolean {
-  const all = getAll();
-  const filtered = all.filter((l) => l.id !== id);
-  if (filtered.length === all.length) return false;
-  saveAll(filtered);
-  return true;
-}
-
-export function togglePublish(id: string): Lesson | null {
-  const lesson = getLesson(id);
+export async function togglePublish(id: string): Promise<Lesson | null> {
+  const lesson = await getLesson(id);
   if (!lesson) return null;
   return updateLesson(id, { published: !lesson.published });
 }

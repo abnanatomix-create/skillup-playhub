@@ -1,14 +1,15 @@
 import { useParams, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Easing } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import VideoPlayer from "@/components/VideoPlayer";
 import FullscreenButton from "@/components/FullscreenButton";
 import StatusCard from "@/components/StatusCard";
 import CourseNotes from "@/components/CourseNotes";
 import HandoutSection from "@/components/HandoutSection";
-import { getLesson } from "@/lib/lessons";
+import { getLesson, type Lesson } from "@/lib/lessons";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -24,7 +25,28 @@ const LessonPlayer = () => {
   const [searchParams] = useSearchParams();
   const returnUrl = searchParams.get("return");
   const backLink = returnUrl || "/";
-  const lesson = id ? getLesson(id) : undefined;
+
+  const [lesson, setLesson] = useState<Lesson | undefined | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    getLesson(id).then((l) => {
+      setLesson(l);
+      setLoading(false);
+    });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="animate-spin text-muted-foreground" size={32} />
+      </div>
+    );
+  }
 
   if (!lesson) {
     return (

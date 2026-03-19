@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { extractVideoSrc } from "@/lib/video-utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,40 +27,55 @@ const getPreviewUrl = (id: string) => `${window.location.origin}/preview/${id}`;
 
 const Admin = () => {
   const [authenticated, setAuthenticated] = useState(isAdminLoggedIn);
-  const [lessons, setLessons] = useState<Lesson[]>(getLessons);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const refresh = useCallback(() => setLessons(getLessons()), []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getLessons();
+      setLessons(data);
+    } catch (err) {
+      console.error("Failed to fetch lessons", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const handleCreate = (data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">) => {
-    createLesson(data);
-    refresh();
+  useEffect(() => {
+    if (authenticated) refresh();
+  }, [authenticated, refresh]);
+
+  const handleCreate = async (data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">) => {
+    await createLesson(data);
+    await refresh();
     setShowForm(false);
     toast({ title: "Lesson created" });
   };
 
-  const handleUpdate = (data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">) => {
+  const handleUpdate = async (data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">) => {
     if (!editingLesson) return;
-    updateLesson(editingLesson.id, data);
-    refresh();
+    await updateLesson(editingLesson.id, data);
+    await refresh();
     setEditingLesson(null);
     toast({ title: "Lesson updated" });
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteTarget) return;
-    deleteLesson(deleteTarget);
-    refresh();
+    await deleteLesson(deleteTarget);
+    await refresh();
     setDeleteTarget(null);
     toast({ title: "Lesson deleted", variant: "destructive" });
   };
 
-  const handleTogglePublish = (id: string) => {
-    const updated = togglePublish(id);
-    refresh();
+  const handleTogglePublish = async (id: string) => {
+    const updated = await togglePublish(id);
+    await refresh();
     toast({ title: updated?.published ? "Lesson published" : "Lesson unpublished" });
   };
 
@@ -124,7 +139,11 @@ const Admin = () => {
           )}
         </AnimatePresence>
 
-        {lessons.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-muted-foreground" size={32} />
+          </div>
+        ) : lessons.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
             <p className="text-lg">No lessons yet</p>
             <p className="text-sm mt-1">Click "Add Lesson" to get started</p>
@@ -136,7 +155,6 @@ const Admin = () => {
                 <Card className="overflow-hidden">
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                      {/* Thumbnail */}
                       <div className="w-full sm:w-40 aspect-video rounded-lg overflow-hidden bg-secondary flex-shrink-0">
                         {extractVideoSrc(lesson.videoLink) ? (
                           <iframe src={extractVideoSrc(lesson.videoLink)} className="w-full h-full pointer-events-none" title={lesson.title} tabIndex={-1} />
@@ -145,7 +163,6 @@ const Admin = () => {
                         )}
                       </div>
 
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h3 className="font-display font-semibold text-foreground truncate">{lesson.title}</h3>
@@ -156,7 +173,6 @@ const Admin = () => {
                         {lesson.instructor && <p className="text-sm text-muted-foreground mb-1">Instructor: {lesson.instructor}</p>}
                         {lesson.description && <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{lesson.description}</p>}
 
-                        {/* Preview link for published lessons */}
                         {lesson.published && (
                           <div className="flex items-center gap-2 mt-2">
                             <Input
@@ -178,7 +194,6 @@ const Admin = () => {
                         )}
                       </div>
 
-                      {/* Actions */}
                       <div className="flex sm:flex-col gap-2 flex-shrink-0">
                         <Button size="icon" variant="ghost" onClick={() => handleTogglePublish(lesson.id)} title={lesson.published ? "Unpublish" : "Publish"}>
                           {lesson.published ? <EyeOff size={16} /> : <Eye size={16} />}
