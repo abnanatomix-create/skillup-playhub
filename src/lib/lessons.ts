@@ -16,6 +16,7 @@ export interface Lesson {
   id: string;
   title: string;
   instructor: string;
+  instructorImage: string;
   description: string;
   videoLink: string;
   handoutLink: string;
