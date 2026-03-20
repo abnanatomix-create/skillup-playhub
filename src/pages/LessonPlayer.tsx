@@ -76,7 +76,7 @@ const LessonPlayer = () => {
     );
   }
 
-  const { title, instructor, description, videoLink, handoutLink } = lesson;
+  const { title, instructor, instructorImage, description, videoLink, handoutLink } = lesson;
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,12 +93,23 @@ const LessonPlayer = () => {
         </motion.div>
 
         <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-tight">{title}</h1>
-          {instructor && (
-            <p className="text-muted-foreground text-sm mt-1">
-              Instructor: <span className="text-foreground font-medium">{instructor}</span>
-            </p>
-          )}
+          <div className="flex items-center gap-4">
+            {instructorImage && (
+              <img
+                src={instructorImage}
+                alt={instructor || "Instructor"}
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-border flex-shrink-0"
+              />
+            )}
+            <div>
+              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-tight">{title}</h1>
+              {instructor && (
+                <p className="text-muted-foreground text-sm mt-1">
+                  Instructor: <span className="text-foreground font-medium">{instructor}</span>
+                </p>
+              )}
+            </div>
+          </div>
         </motion.div>
 
         <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
