@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { extractVideoSrc } from "@/lib/video-utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Copy, Check, LogOut, Loader2, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import EmbedCodeBlock from "@/components/EmbedCodeBlock";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,10 +52,12 @@ const Admin = () => {
   }, [authenticated, refresh]);
 
   const handleCreate = async (data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">) => {
-    await createLesson(data);
+    const created = await createLesson(data);
+    // Auto-publish on create
+    await togglePublish(created.id);
     await refresh();
     setShowForm(false);
-    toast({ title: "Lesson created" });
+    toast({ title: "Lesson published & embed code ready!" });
   };
 
   const handleUpdate = async (data: Omit<Lesson, "id" | "createdAt" | "updatedAt" | "published">) => {
@@ -174,23 +177,7 @@ const Admin = () => {
                         {lesson.description && <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{lesson.description}</p>}
 
                         {lesson.published && (
-                          <div className="flex items-center gap-2 mt-2">
-                            <Input
-                              readOnly
-                              value={getPreviewUrl(lesson.id)}
-                              className="text-xs h-8 bg-secondary border-border text-muted-foreground font-mono"
-                              onClick={(e) => (e.target as HTMLInputElement).select()}
-                            />
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-8 px-3 flex-shrink-0 gap-1.5"
-                              onClick={() => copyLink(lesson.id)}
-                            >
-                              {copiedId === lesson.id ? <Check size={14} className="text-accent" /> : <Copy size={14} />}
-                              <span className="text-xs">{copiedId === lesson.id ? "Copied" : "Copy"}</span>
-                            </Button>
-                          </div>
+                          <EmbedCodeBlock lessonId={lesson.id} />
                         )}
                       </div>
 
