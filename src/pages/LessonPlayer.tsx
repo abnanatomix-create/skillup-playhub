@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Easing } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import Navbar from "@/components/Navbar";
+
 import VideoPlayer from "@/components/VideoPlayer";
 import FullscreenButton from "@/components/FullscreenButton";
 import StatusCard from "@/components/StatusCard";
@@ -22,9 +22,6 @@ const fadeUp = {
 
 const LessonPlayer = () => {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const returnUrl = searchParams.get("return");
-  const backLink = returnUrl || "https://skill-up-abn.netlify.app/dashboard";
 
   const [lesson, setLesson] = useState<Lesson | undefined | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +48,6 @@ const LessonPlayer = () => {
   if (!lesson) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <h1 className="font-display text-2xl font-bold text-foreground mb-2">Lesson not found</h1>
@@ -65,7 +61,6 @@ const LessonPlayer = () => {
   if (!lesson.published) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <h1 className="font-display text-2xl font-bold text-foreground mb-2">Lesson unavailable</h1>
@@ -80,19 +75,8 @@ const LessonPlayer = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="max-w-[900px] mx-auto px-4 py-6 sm:py-10 flex flex-col gap-6">
         <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp}>
-          <a
-            href={backLink}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
-          >
-            <ArrowLeft size={16} />
-            <span>Back to SkillUp</span>
-          </a>
-        </motion.div>
-
-        <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
           <div className="flex items-center gap-4">
             {instructorImage && (
               <img
