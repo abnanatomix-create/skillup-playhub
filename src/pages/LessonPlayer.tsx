@@ -1,8 +1,8 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Easing } from "framer-motion";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import VideoPlayer from "@/components/VideoPlayer";
 import FullscreenButton from "@/components/FullscreenButton";
