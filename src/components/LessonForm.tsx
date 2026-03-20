@@ -7,13 +7,14 @@ import type { Lesson } from "@/lib/lessons";
 
 interface LessonFormProps {
   lesson?: Lesson | null;
-  onSubmit: (data: { title: string; instructor: string; description: string; videoLink: string; handoutLink: string }) => void;
+  onSubmit: (data: { title: string; instructor: string; instructorImage: string; description: string; videoLink: string; handoutLink: string }) => void;
   onCancel: () => void;
 }
 
 const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
   const [title, setTitle] = useState("");
   const [instructor, setInstructor] = useState("");
+  const [instructorImage, setInstructorImage] = useState("");
   const [description, setDescription] = useState("");
   const [videoLink, setVideoLink] = useState("");
   const [handoutLink, setHandoutLink] = useState("");
@@ -22,6 +23,7 @@ const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
     if (lesson) {
       setTitle(lesson.title);
       setInstructor(lesson.instructor);
+      setInstructorImage(lesson.instructorImage || "");
       setDescription(lesson.description);
       setVideoLink(lesson.videoLink);
       setHandoutLink(lesson.handoutLink);
@@ -31,7 +33,14 @@ const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !videoLink.trim()) return;
-    onSubmit({ title: title.trim(), instructor: instructor.trim(), description: description.trim(), videoLink: videoLink.trim(), handoutLink: handoutLink.trim() });
+    onSubmit({
+      title: title.trim(),
+      instructor: instructor.trim(),
+      instructorImage: instructorImage.trim(),
+      description: description.trim(),
+      videoLink: videoLink.trim(),
+      handoutLink: handoutLink.trim(),
+    });
   };
 
   return (
@@ -40,9 +49,15 @@ const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
         <Label htmlFor="title">Lesson Title *</Label>
         <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Free After Effects Course" required />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="instructor">Instructor Name</Label>
-        <Input id="instructor" value={instructor} onChange={(e) => setInstructor(e.target.value)} placeholder="e.g. Abenezar" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="instructor">Instructor Name</Label>
+          <Input id="instructor" value={instructor} onChange={(e) => setInstructor(e.target.value)} placeholder="e.g. Abenezar" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="instructorImage">Instructor Profile Picture URL</Label>
+          <Input id="instructorImage" value={instructorImage} onChange={(e) => setInstructorImage(e.target.value)} placeholder="https://example.com/photo.jpg" />
+        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
@@ -58,7 +73,7 @@ const LessonForm = ({ lesson, onSubmit, onCancel }: LessonFormProps) => {
       </div>
       <div className="flex gap-3 pt-2">
         <Button type="submit" className="gradient-bg gradient-bg-hover text-primary-foreground font-semibold">
-          {lesson ? "Update Lesson" : "Add Lesson"}
+          {lesson ? "Update Lesson" : "Publish & Generate Embed"}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
