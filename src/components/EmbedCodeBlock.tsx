@@ -11,7 +11,22 @@ const EmbedCodeBlock = ({ lessonId }: EmbedCodeBlockProps) => {
   const [copied, setCopied] = useState(false);
 
   const baseUrl = window.location.origin;
-  const embedCode = `<iframe\n    src="${baseUrl}/preview/${lessonId}"\n    width="100%"\n    height="600px"\n    style="border:none; border-radius:12px;"\n    allowfullscreen\n></iframe>`;
+  const embedCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillUp Course</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #020617; }
+    iframe { width: 100%; height: 100vh; border: none; }
+  </style>
+</head>
+<body>
+  <iframe src="${baseUrl}/preview/${lessonId}" allowfullscreen></iframe>
+</body>
+</html>`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(embedCode);
